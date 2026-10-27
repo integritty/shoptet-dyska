@@ -17,6 +17,14 @@ describe("styles", () => {
     expect(CSS_TEXT).toMatch(/\.dyska-block\[hidden\],\.dyska-block \[hidden\]\{display:none !important\}/);
   });
 
+  it("the service checkboxes reset the template's custom checkbox styling (native, in flow, visible)", () => {
+    // Some templates hide native checkboxes (appearance:none; position:absolute) and draw their own; our grid layout needs them in flow.
+    const rule = /\.dyska-block \.dyska-service input\{([^}]*)\}/.exec(CSS_TEXT)[1];
+    expect(rule).toContain("position:static");
+    expect(rule).toContain("appearance:auto");
+    expect(rule).toContain("opacity:1");
+  });
+
   it("hidden elements are not displayed once the stylesheet is in the document", () => {
     const style = document.createElement("style");
     style.textContent = CSS_TEXT;

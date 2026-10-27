@@ -127,13 +127,23 @@ export function uninstallShoptet() {
 }
 
 // Minimal cart page markup containing one mount target.
-export function cartPage() {
+// `flex: true` mimics a template that lays the cart out as a flex column with explicit `order` values.
+export function cartPage(options = {}) {
   document.body.textContent = "";
   const content = document.createElement("div");
   content.className = "cart-content";
   const table = document.createElement("div");
   table.className = "cart-table";
   content.appendChild(table);
+  if (options.flex) {
+    content.style.display = "flex";
+    content.style.flexDirection = "column";
+    table.style.order = "1";
+    const summary = document.createElement("div");
+    summary.className = "summary";
+    summary.style.order = "4";
+    content.appendChild(summary);
+  }
   document.body.appendChild(content);
 }
 

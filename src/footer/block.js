@@ -6,12 +6,27 @@ import { quantityOf, readCartLines } from "./shoptet.js";
 import { injectStyles } from "./styles.js";
 import { createView } from "./view.js";
 
+// Some templates lay the cart container out with flex/grid and explicit `order` values (e.g. the table 1, the summary 4).
+// An inserted element has order 0 and would be drawn before all of them, at the very top of the cart. Give the block an
+// order that keeps it where it sits in the DOM: right after the anchor, or after every sibling when appended.
+function keepDomPosition(root, anchor, position) {
+  const parent = position === "after" ? anchor.parentNode : anchor;
+  if (!parent || !/(^|-)(flex|grid)$/.test(window.getComputedStyle(parent).display)) return;
+  const orderOf = (node) => Number.parseInt(window.getComputedStyle(node).order, 10) || 0;
+  const order =
+    position === "after"
+      ? orderOf(anchor) + 1
+      : Math.max(0, ...[...parent.children].filter((child) => child !== root).map(orderOf)) + 1;
+  if (order > 1) root.style.order = String(order);
+}
+
 function place(root) {
   for (const target of MOUNT_TARGETS) {
     const node = document.querySelector(target.selector);
     if (!node) continue;
     if (target.position === "after" && node.parentNode) node.parentNode.insertBefore(root, node.nextSibling);
     else node.appendChild(root);
+    keepDomPosition(root, node, target.position === "after" && node.parentNode ? "after" : "append");
     return true;
   }
   return false;
