@@ -1,0 +1,51 @@
+const CS = {
+  blockLabel: "Doplňky k objednávce",
+  tipTitle: "Přidat spropitné",
+  tipHint: "Poděkujte lidem, kteří vaši objednávku připravují.",
+  tipGroup: "Výše spropitného",
+  tipThanks: "Mockrát děkujeme",
+  servicesTitle: "Doplňkové služby",
+  parcelProtection: "Ochrana zásilky",
+  parcelProtectionHint: "Pojištění zásilky pro případ ztráty nebo poškození.",
+  priorityShipping: "Přednostní expedice",
+  priorityShippingHint: "Vaše objednávka se vyřídí přednostně.",
+  giftTitle: "Dárková kartička",
+  giftHint: "Ke každé kartičce můžete připsat věnování.",
+  cardCount: "Počet kartiček",
+  cardMore: "Přidat kartičku",
+  cardLess: "Ubrat kartičku",
+  noteLabel: (n, total) => (total > 1 ? `Věnování ${n}` : "Věnování"),
+  notePlaceholder: "Napište pár slov na kartičku…",
+  error: "Změnu se nepodařilo provést. Zkuste to prosím znovu.",
+  priceError: "Cena doplňku v košíku neodpovídá nabídce, proto byl z košíku odebrán.",
+  orphanNotice: "V košíku je položka doplňku, která už není nabízena.",
+  orphanRemove: "Odebrat z košíku",
+};
+
+const SK = {
+  blockLabel: "Doplnky k objednávke",
+  tipTitle: "Pridať prepitné",
+  tipHint: "Poďakujte ľuďom, ktorí vašu objednávku pripravujú.",
+  tipGroup: "Výška prepitného",
+  tipThanks: "Veľmi pekne ďakujeme",
+  servicesTitle: "Doplnkové služby",
+  parcelProtection: "Ochrana zásielky",
+  parcelProtectionHint: "Poistenie zásielky pre prípad straty alebo poškodenia.",
+  priorityShipping: "Prednostná expedícia",
+  priorityShippingHint: "Vaša objednávka sa vybaví prednostne.",
+  giftTitle: "Darčeková kartička",
+  giftHint: "Ku každej kartičke môžete pripísať venovanie.",
+  cardCount: "Počet kartičiek",
+  cardMore: "Pridať kartičku",
+  cardLess: "Ubrať kartičku",
+  noteLabel: (n, total) => (total > 1 ? `Venovanie ${n}` : "Venovanie"),
+  notePlaceholder: "Napíšte pár slov na kartičku…",
+  error: "Zmenu sa nepodarilo vykonať. Skúste to prosím znova.",
+  priceError: "Cena doplnku v košíku nezodpovedá ponuke, preto bol z košíka odobraný.",
+  orphanNotice: "V košíku je položka doplnku, ktorá už nie je ponúkaná.",
+  orphanRemove: "Odobrať z košíka",
+};
+
+export function textsFor(language) {
+  return language === "sk" ? SK : CS;
+}
