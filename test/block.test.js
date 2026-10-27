@@ -9,9 +9,9 @@ let shop;
 let http;
 let refresh;
 
-function boot(shopOptions, fetchOptions) {
+function boot(shopOptions, fetchOptions, pageOptions) {
   setPath("/kosik/");
-  cartPage();
+  cartPage(pageOptions);
   shop = installShoptet({ cart: [NORM], ...shopOptions });
   http = installFetch(fetchOptions);
   refresh = vi.fn();
@@ -47,6 +47,22 @@ describe("mounting", () => {
     expect(http.requests[0].url).toBe("https://api.example/api/v1/public/config?eshopId=123456");
     expect(document.querySelector(".cart-content").children[1]).toBe(root());
     expect(document.documentElement.getAttribute("data-dyska")).toBe("mounted");
+  });
+
+  it("keeps the block right after the table in a flex cart with explicit order values (not at the very top)", async () => {
+    await boot(undefined, undefined, { flex: true });
+    const container = document.querySelector(".cart-content");
+    expect(container.children[1]).toBe(root());
+    const order = (node) => Number.parseInt(window.getComputedStyle(node).order, 10) || 0;
+    const table = container.querySelector(".cart-table");
+    const summary = container.querySelector(".summary");
+    expect(order(root())).toBeGreaterThan(order(table));
+    expect(order(root())).toBeLessThan(order(summary));
+  });
+
+  it("does not set an order in a plain (non flex) cart", async () => {
+    await boot();
+    expect(root().style.order).toBe("");
   });
 
   it("is idempotent: repeated events and a second start never create a second block", async () => {

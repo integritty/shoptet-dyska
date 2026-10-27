@@ -18,7 +18,7 @@ export const CSS_TEXT = `
 .dyska-block .dyska-coin[aria-pressed="true"]::before{content:"\\2713\\00a0"}
 .dyska-block .dyska-thanks{margin:0;min-height:1.2em;font-weight:600}
 .dyska-block .dyska-service{display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;align-items:center;min-height:44px;padding:8px 0;cursor:pointer}
-.dyska-block .dyska-service input{width:20px;height:20px;margin:0;accent-color:var(--dyska-accent)}
+.dyska-block .dyska-service input{position:static;appearance:auto;-webkit-appearance:checkbox;opacity:1;clip:auto;transform:none;width:20px;height:20px;margin:0;accent-color:var(--dyska-accent)}
 .dyska-block .dyska-service-name{font-weight:600}
 .dyska-block .dyska-service-hint{grid-column:2;opacity:.8;font-size:.9em}
 .dyska-block .dyska-price{white-space:nowrap;font-weight:600}
