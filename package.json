@@ -1,7 +1,7 @@
 {
   "name": "shoptet-dyska",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Dyska (tips, extra services and gift card) block for the Shoptet cart, built for Shoptet Addon Repository",
   "type": "module",
   "scripts": {
