@@ -159,7 +159,7 @@ export function createBlock({ config, language, currency, ops: rawOps, store, no
   }
 
   const handlers = createHandlers({ config, actions, enqueue, store, notesSync });
-  const view = createView({ config, text: textsFor(language), fmt: (minor) => formatPrice(minor, currency, language), handlers });
+  const view = createView({ config, text: textsFor(language, config.texts), fmt: (minor) => formatPrice(minor, currency, language), handlers });
 
   function sync() {
     if (pending > 0) return;

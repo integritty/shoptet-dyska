@@ -120,11 +120,35 @@ in both cases (https only); `DYSKA_OUT_FILE` redirects the output (the build tes
   a successful retry uses the ref the server returned. When the cart cannot be read in step 2, text is written only if it is synced and has a ref; otherwise nothing is written. The hook is wrapped at most a few times and does its work once even if a
   foreign script wraps it again.
 
+## Appearance and texts
+
+The merchant can change colours, the corner radius and the texts in the administration of the add-on (tab "Vzhled a texty").
+The backend sends them in the public config as two optional objects with **filled values only** (never `null`); an older
+backend sends none of them and the block then looks exactly as before. Like everything else from the backend, they are
+**validated again** in `config.js` (`normalizeConfig`):
+
+| Field | Rule | Effect |
+| --- | --- | --- |
+| `appearance.accentColor` | `^#[0-9a-fA-F]{6}$` | `--dyska-accent` on the block root (selected coin, checkbox, focus ring); default `currentColor` of the template |
+| `appearance.borderColor` | same | `--dyska-border`; default a neutral semi-transparent grey |
+| `appearance.borderRadius` | integer 0-24 | `--dyska-radius` in px; default 8 |
+| `texts.<key>` | whitelisted key, string, sanitised like a gift text (control/format characters and `[dyska:` removed), non-empty, within the limit, otherwise dropped (not cut) | overrides the default text for the shop language |
+
+Variables are set with `style.setProperty` on the root only for validated values; the text goes through `textContent`
+only. Text keys and limits (code points): `blockTitle` 120, `blockSubtitle` 240, `tipTitle` 120, `tipHint` 300, `tipThanks` 80,
+`servicesTitle` 120, `parcelProtectionName` 80, `parcelProtectionHint` 200, `priorityShippingName` 80,
+`priorityShippingHint` 200, `giftTitle` 120 (the card price is appended in brackets), `giftHint` 300, `giftPlaceholder` 120
+(the placeholder of the dedication field). `blockTitle` / `blockSubtitle` are rendered as a heading (`h2.dyska-block-title`,
+`p.dyska-block-subtitle`) above the cards only when filled. There is one set of texts per shop (the merchant writes in the
+shop language); texts that are not set keep the Czech / Slovak defaults from `i18n.js` (`textsFor(language, overrides)`).
+The administration keeps a copy of the defaults (placeholders and preview) in `apps/admin/src/block-defaults.ts` of the
+backend repository: change both together.
+
 ## Backend contract
 
 | Call | Used for |
 | --- | --- |
-| `GET /api/v1/public/config?eshopId=` | `active`, `priceUnit:"minor"`, `parcelProtection`, `priorityShipping`, `giftCard` (`enabled`, `price`, `maxLength`, `allowMultiple`), `carriers` (`tips[{amount,code}]`, `parcelProtection{code}`, `priorityShipping{code}`, `giftCard{code}`) |
+| `GET /api/v1/public/config?eshopId=` | `active`, `priceUnit:"minor"`, `parcelProtection`, `priorityShipping`, `giftCard` (`enabled`, `price`, `maxLength`, `allowMultiple`), `carriers` (`tips[{amount,code}]`, `parcelProtection{code}`, `priorityShipping{code}`, `giftCard{code}`), optional `appearance` and `texts` (see "Appearance and texts") |
 | `PUT /api/v1/public/notes` `{eshopId, ref?, notes[]}` | store or overwrite the gift texts, returns `{ref}` |
 | `DELETE /api/v1/public/notes` `{eshopId, ref}` | the customer deleted the text or removed the cards |
 
@@ -148,5 +172,5 @@ exercised against a live storefront.
 - [ ] Interaction with discounts, free shipping thresholds, gift-with-order add-ons and coupons (carriers count towards the cart value).
 - [ ] CORS preflight for `PUT`/`DELETE` with `keepalive` when the page is closed (best effort).
 - [ ] Addon Repository: `npm ci && npm run build -- --env production` is what is run (production origin from `--env production`), a `<style>` element injected by script is accepted (CSP), subfolders/flat layout of `src/footer`, no obfuscation, `--env` accepts only `production` or `development` (anything else fails the build; no `--env` means development).
-- [ ] Backend: the public config now carries `currency` (derived from the shop language); texts still are not part of it and exist in Czech and Slovak only.
+- [ ] Backend: the public config now carries `currency` (derived from the shop language) and the optional `appearance` / `texts` customisation; the built-in default texts exist in Czech and Slovak only.
 - [ ] The backend fallback for the dedication text only reads a remark that starts with the gift label, so the unmarked fragment is written first. With a marker the fragment follows the customer's text (the `ref` marker is used, so the fallback only matters when the stored note expired). The fallback takes the whole remark as the gift text, including the customer's own lines below the fragment.
