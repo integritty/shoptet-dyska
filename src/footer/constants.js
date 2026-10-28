@@ -9,6 +9,27 @@ export const DEFAULT_CARD_CODE = "DYSKA-CARD";
 export const CARRIER_CODE_RE = /^DYSKA-(TIP-\d{1,7}|PROTECTION|PRIORITY|CARD)$/;
 export const TIP_CODE_RE = /^DYSKA-TIP-(\d{1,7})$/;
 
+// Appearance and text customisation from the backend (public config `appearance` / `texts`). Everything is validated
+// again here: a colour goes into a CSS custom property, so only #rrggbb is accepted; text limits mirror the backend.
+export const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+export const RADIUS_MIN = 0;
+export const RADIUS_MAX = 24;
+export const TEXT_LIMITS = {
+  blockTitle: 120,
+  blockSubtitle: 240,
+  tipTitle: 120,
+  tipHint: 300,
+  tipThanks: 80,
+  servicesTitle: 120,
+  parcelProtectionName: 80,
+  parcelProtectionHint: 200,
+  priorityShippingName: 80,
+  priorityShippingHint: 200,
+  giftTitle: 120,
+  giftHint: 300,
+  giftPlaceholder: 120,
+};
+
 export const ROOT_ATTR = "data-dyska";
 export const BLOCK_ATTR = "data-dyska-root";
 export const STYLE_ATTR = "data-dyska-style";

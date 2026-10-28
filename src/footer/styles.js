@@ -7,6 +7,9 @@ export const CSS_TEXT = `
 .dyska-block{--dyska-accent:currentColor;--dyska-border:rgba(128,128,128,.45);--dyska-surface:rgba(128,128,128,.12);--dyska-radius:8px;box-sizing:border-box;display:grid;gap:16px;margin:24px 0;font:inherit;color:inherit;text-align:left}
 .dyska-block *,.dyska-block *::before,.dyska-block *::after{box-sizing:border-box}
 .dyska-block[hidden],.dyska-block [hidden]{display:none !important}
+.dyska-block .dyska-heading{display:grid;gap:4px}
+.dyska-block .dyska-block-title{margin:0;font:inherit;font-size:1.3em;font-weight:700;color:inherit}
+.dyska-block .dyska-block-subtitle{margin:0;opacity:.8}
 .dyska-block .dyska-card{border:1px solid var(--dyska-border);border-radius:var(--dyska-radius);padding:16px;display:grid;gap:12px}
 .dyska-block .dyska-title{margin:0;font:inherit;font-size:1.15em;font-weight:700;color:inherit}
 .dyska-block .dyska-hint{margin:0;opacity:.8;font-size:.95em}

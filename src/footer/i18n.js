@@ -1,5 +1,7 @@
 const CS = {
   blockLabel: "Doplňky k objednávce",
+  blockTitle: "",
+  blockSubtitle: "",
   tipTitle: "Přidat spropitné",
   tipHint: "Poděkujte lidem, kteří vaši objednávku připravují.",
   tipGroup: "Výše spropitného",
@@ -24,6 +26,8 @@ const CS = {
 
 const SK = {
   blockLabel: "Doplnky k objednávke",
+  blockTitle: "",
+  blockSubtitle: "",
   tipTitle: "Pridať prepitné",
   tipHint: "Poďakujte ľuďom, ktorí vašu objednávku pripravujú.",
   tipGroup: "Výška prepitného",
@@ -46,6 +50,30 @@ const SK = {
   orphanRemove: "Odobrať z košíka",
 };
 
-export function textsFor(language) {
-  return language === "sk" ? SK : CS;
+// Config text key -> key in the language table (the config names differ for three of them).
+const OVERRIDE_KEYS = {
+  blockTitle: "blockTitle",
+  blockSubtitle: "blockSubtitle",
+  tipTitle: "tipTitle",
+  tipHint: "tipHint",
+  tipThanks: "tipThanks",
+  servicesTitle: "servicesTitle",
+  parcelProtectionName: "parcelProtection",
+  parcelProtectionHint: "parcelProtectionHint",
+  priorityShippingName: "priorityShipping",
+  priorityShippingHint: "priorityShippingHint",
+  giftTitle: "giftTitle",
+  giftHint: "giftHint",
+  giftPlaceholder: "notePlaceholder",
+};
+
+// Default texts for the shop language, with the merchant's texts from the (validated) config on top. The defaults
+// are used for every text that is not overridden; without overrides the plain language table is returned.
+export function textsFor(language, overrides) {
+  const base = language === "sk" ? SK : CS;
+  const keys = Object.keys(OVERRIDE_KEYS).filter((key) => overrides && typeof overrides[key] === "string" && overrides[key] !== "");
+  if (keys.length === 0) return base;
+  const merged = { ...base };
+  for (const key of keys) merged[OVERRIDE_KEYS[key]] = overrides[key];
+  return merged;
 }

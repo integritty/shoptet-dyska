@@ -69,6 +69,14 @@ function cutUnits(text, units) {
   return out;
 }
 
+// A merchant-defined label from the public config: sanitised like a gift text and dropped (null) when it is empty
+// or longer than `max` code points. A value over the limit means a broken or tampered answer, so it is not cut.
+export function cleanLabel(raw, max) {
+  if (typeof raw !== "string" || raw.length > max * 2) return null;
+  const text = sanitizeNote(raw, Number.MAX_SAFE_INTEGER);
+  return text === "" || charCount(text) > max ? null : text;
+}
+
 export function sanitizeNote(raw, maxLength) {
   let text = String(raw).normalize("NFC").replace(/[\r\n\t]+/g, " ");
   text = stripForbidden(text);

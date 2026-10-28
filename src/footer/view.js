@@ -1,4 +1,4 @@
-import { BLOCK_ATTR, MAX_CARDS } from "./constants.js";
+import { BLOCK_ATTR, HEX_COLOR_RE, MAX_CARDS, RADIUS_MAX, RADIUS_MIN } from "./constants.js";
 import { el } from "./dom.js";
 import { charCount, cutChars } from "./format.js";
 
@@ -178,6 +178,28 @@ function buildOrphans(text, handlers, ui) {
   return { notice, update: (state) => (notice.hidden = state.orphans === 0) };
 }
 
+// Optional block heading: only the filled parts are rendered (the merchant's title and subtitle, never defaults).
+const BLOCK_TITLE_ID = "dyska-block-title";
+
+function buildHeading(text) {
+  if (!text.blockTitle && !text.blockSubtitle) return null;
+  return el("header", { class: "dyska-heading" }, [
+    text.blockTitle ? el("h2", { class: "dyska-block-title", id: BLOCK_TITLE_ID, text: text.blockTitle }) : null,
+    text.blockSubtitle ? el("p", { class: "dyska-block-subtitle", text: text.blockSubtitle }) : null,
+  ]);
+}
+
+// Sets the CSS custom properties through the CSSOM. Only values that normalizeConfig validated reach this point
+// (#rrggbb colours, an integer radius), and a custom property cannot carry anything else than that text anyway.
+function applyAppearance(root, appearance) {
+  const look = appearance || {};
+  if (HEX_COLOR_RE.test(look.accentColor || "")) root.style.setProperty("--dyska-accent", look.accentColor);
+  if (HEX_COLOR_RE.test(look.borderColor || "")) root.style.setProperty("--dyska-border", look.borderColor);
+  if (Number.isInteger(look.borderRadius) && look.borderRadius >= RADIUS_MIN && look.borderRadius <= RADIUS_MAX) {
+    root.style.setProperty("--dyska-radius", `${look.borderRadius}px`);
+  }
+}
+
 // Builds the block with DOM APIs only. `update(state)` reflects the cart; it never changes the cart itself.
 export function createView({ config, text, fmt, handlers }) {
   const error = el("p", { class: "dyska-error", role: "alert", hidden: true });
@@ -188,11 +210,14 @@ export function createView({ config, text, fmt, handlers }) {
   if (services) parts.push(services);
   if (config.giftCard) parts.push(buildGift(config, text, fmt, handlers, ui));
   const orphans = buildOrphans(text, handlers, ui);
+  // The region is named by the visible heading when the merchant filled it in, otherwise by the default label.
+  const nameAttr = text.blockTitle ? { "aria-labelledby": BLOCK_TITLE_ID } : { "aria-label": text.blockLabel };
   const root = el(
     "div",
-    { class: "dyska-block", [BLOCK_ATTR]: "", role: "region", "aria-label": text.blockLabel, hidden: true },
-    [...parts.map((part) => part.section), orphans.notice, error],
+    { class: "dyska-block", [BLOCK_ATTR]: "", role: "region", ...nameAttr, hidden: true },
+    [buildHeading(text), ...parts.map((part) => part.section), orphans.notice, error],
   );
+  applyAppearance(root, config.appearance);
   return {
     root,
     update(state) {

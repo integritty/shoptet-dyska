@@ -1,5 +1,16 @@
 import { getPublicConfig } from "./api.js";
-import { CARRIER_CODE_RE, DEFAULT_CARD_CODE, PRIORITY_CODE, PROTECTION_CODE, TIP_CODE_PREFIX } from "./constants.js";
+import {
+  CARRIER_CODE_RE,
+  DEFAULT_CARD_CODE,
+  HEX_COLOR_RE,
+  PRIORITY_CODE,
+  PROTECTION_CODE,
+  RADIUS_MAX,
+  RADIUS_MIN,
+  TEXT_LIMITS,
+  TIP_CODE_PREFIX,
+} from "./constants.js";
+import { cleanLabel } from "./format.js";
 
 const isMinor = (value) => Number.isInteger(value) && value >= 0;
 
@@ -41,6 +52,30 @@ function unique(service, used) {
   return service;
 }
 
+// Keeps only values that are safe to put into CSS custom properties: #rrggbb colours and an integer radius.
+function readAppearance(raw) {
+  const out = {};
+  if (!raw || typeof raw !== "object") return out;
+  for (const key of ["accentColor", "borderColor"]) {
+    if (typeof raw[key] === "string" && HEX_COLOR_RE.test(raw[key])) out[key] = raw[key].toLowerCase();
+  }
+  if (Number.isInteger(raw.borderRadius) && raw.borderRadius >= RADIUS_MIN && raw.borderRadius <= RADIUS_MAX) {
+    out.borderRadius = raw.borderRadius;
+  }
+  return out;
+}
+
+// Whitelisted keys only, each a clean non-empty string within its limit (shown with textContent, never as HTML).
+function readTexts(raw) {
+  const out = {};
+  if (!raw || typeof raw !== "object") return out;
+  for (const key of Object.keys(TEXT_LIMITS)) {
+    const text = cleanLabel(raw[key], TEXT_LIMITS[key]);
+    if (text) out[key] = text;
+  }
+  return out;
+}
+
 // Validates the public config. Only carriers that the backend reports as ready are offered.
 // Returns null when the add-on is inactive, the shape is unexpected or nothing would be shown.
 export function normalizeConfig(raw) {
@@ -55,6 +90,9 @@ export function normalizeConfig(raw) {
     parcelProtection: unique(readService(raw.parcelProtection, carriers.parcelProtection, PROTECTION_CODE), used),
     priorityShipping: unique(readService(raw.priorityShipping, carriers.priorityShipping, PRIORITY_CODE), used),
     giftCard: unique(readGift(raw.giftCard, carriers.giftCard), used),
+    // Optional (older backends do not send them): customisation of the look and the texts.
+    appearance: readAppearance(raw.appearance),
+    texts: readTexts(raw.texts),
   };
   const empty = tips.length === 0 && !config.parcelProtection && !config.priorityShipping && !config.giftCard;
   return empty ? null : config;
